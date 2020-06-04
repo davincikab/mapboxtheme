@@ -4,7 +4,7 @@
     --white:hsl(120, 50%, 100%);
     --gray:hsl(0, 1%, 63%);
     --spinner-backdrop:hsla(0, 0%, 0%, 0.8);
-    font-size: calc(0.6em + 1vh);
+    font-size: calc(0.5em + 1vh);
     font-family: monospace;
 }
 
@@ -218,7 +218,7 @@ body {
  @media (min-width:35em) {
 
   .main-container .open-menu {
-      width:25vw;
+      width:35vw;
       display: block;
   }
 
@@ -233,4 +233,9 @@ body {
     width: 10%;
     height: 10%;
   }
+
+  .main-container .open-menu {
+    width:25vw;
+    display: block;
+}
 }
