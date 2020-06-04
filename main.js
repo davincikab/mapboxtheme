@@ -24,6 +24,7 @@ var transformRequest = (url, resourceType) => {
     var company = $('#company');
     var type = $('#type');
     var pointData;
+    var datesArray;
     var filteredData = {
         "type": "FeatureCollection",
         "features": []
@@ -52,6 +53,12 @@ var transformRequest = (url, resourceType) => {
         updateCompanyInput();
         updateScoreInput();
         updateDateInput();
+
+        // hide the modal
+        setTimeout(function(e){
+          $('.spinner-modal').css('display', 'none');
+        },4000)
+        
 
         // Load the map
         map.on('load', function () {
@@ -205,8 +212,9 @@ var transformRequest = (url, resourceType) => {
 
     date.on('change', function(e){
         let value = $(this).val();
+        let date = datesArray[value];
 
-        filterData('SCORE', value);
+        filterData('DATE', date);
     });
 
     // filter the data and update the map
@@ -219,6 +227,15 @@ var transformRequest = (url, resourceType) => {
         });
 
         map.getSource("csvData").setData(filteredData);
+
+        // get layer bounds and fit to the bounds
+        var filterCount = filteredData.features.length - 1;
+        var coordinates = filteredData.features.map(feature => feature.geometry.coordinates);
+        let latBounds = new mapboxgl.LngLatBounds(coordinates[0], coordinates[filterCount]);
+      
+        map.fitBounds(latBounds, {
+          padding:20
+        });
     }
 
     // Update the type
@@ -264,8 +281,19 @@ var transformRequest = (url, resourceType) => {
         dates = [...new Set(dates)];
 
         // sort the dates
+        dates = dates.sort((a,b) => new Date(a) -new Date(b));
+        datesArray = [...dates];
+
         // ge the first and the last
+        $('.start-date').text(dates[0]);
+        $('.end-date').text(dates[dates.length - 1]);
+
         // Create the slider
+        date.attr({
+          'max':dates.length-1,
+          'min':0
+        });
+
     }
 
     // toggle the side-menu
