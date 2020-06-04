@@ -34,6 +34,7 @@ body {
       position: absolute;
       top:calc(2% + 1vh);
       left: 2vw;
+      font-weight: bolder;
   }
 
   #toggle-menu:focus {
@@ -220,11 +221,15 @@ body {
   .main-container .open-menu {
       width:35vw;
       display: block;
+  } 
+
+  .spinning-box {
+    left: 46%;
   }
 
   .spinner-status {
-    bottom:35%;
-    left: calc(35% + 7vw);
+    bottom:38%;
+    left: calc(40% + 7vw);
   }
 }
 
