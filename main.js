@@ -20,11 +20,23 @@ var transformRequest = (url, resourceType) => {
 
   $(document).ready(function () {
     var score = $('#score');
-    var date = $('#date');
+    var date = $("#date");
     var company = $('#company');
     var type = $('#type');
     var pointData;
     var datesArray;
+    var activeIndex = 0;
+    var popupContent;
+    var popup;
+    var popupCoordinate;
+    var filterObject = {
+      'COMPANY':'All Companies',
+      'TYPE':'All Types',
+      'SCORE':null,
+      'DATE':["1 March 2017", "03 June 2020"]
+    };
+
+    var isFilterMode = false;
     var filteredData = {
         "type": "FeatureCollection",
         "features": []
@@ -120,7 +132,23 @@ var transformRequest = (url, resourceType) => {
             filter:['!', ['has', 'point_count']],
             paint:{
                 'circle-radius':8,
-                'circle-color':'red',
+                'circle-color': [
+                  'match',
+                  ['get', 'TYPE'],
+                  'TYPEA',
+                  '#F2F12D',
+                  'TYPEB',
+                  '#EED322',
+                  'TYPEC',
+                  '#E6B71E',
+                  'TYPED',
+                  '#DA9C20',
+                  'TYPEE',
+                  '#CA8323',
+                  'TYPEF',
+                  '#B86B25',
+                  '#dd0000'
+                ],
                 'circle-stroke-width':0,
             }
 
@@ -151,6 +179,7 @@ var transformRequest = (url, resourceType) => {
           // When a click event occurs on a feature in the csvData layer, open a popup at the
           // location of the feature, with description HTML from its properties.
           map.on('click', 'unclustered', function (e) {
+            console.log(e.features);
             var coordinates = e.features[0].geometry.coordinates.slice();
 
             //set popup text 
@@ -158,6 +187,19 @@ var transformRequest = (url, resourceType) => {
             // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV. 
             var description = `<h3>` + e.features[0].properties.TYPE + `</h3>` + `<h4>` + `<b>` + `COMPANY: ` + `</b>` + e.features[0].properties.COMPANY + `</h4>` + `<h4>` + `<b>` + `SCORE: ` + `</b>` + e.features[0].properties.SCORE + `</h4>`;
 
+            if(e.features.length > 1){
+              let features = e.features;
+              
+              popupContent = features.map(feature => {
+                return `<div class="popup-element"><h3><i class="fa fa-caret-left" id="left"></i>` + feature.properties.TYPE + `<i class="fa fa-caret-right" id="right"></i></h3>` + `<h4>` + `<b>` + `COMPANY: ` + `</b>` + 
+                  feature.properties.COMPANY + `</h4>` + `<h4>` + `<b>` + `SCORE: ` + `</b>` + feature.properties.SCORE + `</h4></div>`;
+
+              });
+
+              
+              description = `<div class="popup-container">${popupContent[0]}</div>`;
+              
+            }
             // Ensure that if the map is zoomed out such that multiple
             // copies of the feature are visible, the popup appears
             // over the copy being pointed to.
@@ -165,13 +207,17 @@ var transformRequest = (url, resourceType) => {
               coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
             }
 
+            popupCoordinate = coordinates;
             //add Popup to map
 
             new mapboxgl.Popup()
               .setLngLat(coordinates)
               .setHTML(description)
               .addTo(map);
-          });
+
+              popupClickHandler();
+            });
+
 
           // Change the cursor to a pointer when the mouse is over the places layer.
           map.on('mouseenter', 'unclustered', function () {
@@ -195,53 +241,105 @@ var transformRequest = (url, resourceType) => {
     type.on('change', function(e) {
         let value = $(this).val();
         console.log(pointData);
-        filterData('TYPE', value);
+
+        filterObject.TYPE = value;
+        filterData(filterObject);
     });
 
     company.on('change', function(e) {
         let value = $(this).val();
 
-        filterData('COMPANY', value);
+        filterObject.COMPANY = value;
+        filterData(filterObject);
     });
 
     score.on('change', function(e) {
         let value = $(this).val();
 
-        filterData('SCORE', value);
-    });
-
-    date.on('change', function(e){
-        let value = $(this).val();
-        let date = datesArray[value];
-
-        filterData('DATE', date);
+        filterObject.SCORE = value;
+        filterData(filterObject);
     });
 
     // filter the data and update the map
-    function filterData(field, value) {
+    function filterData(criteria) {
+        // resetIndex
+        activeIndex = 0;
         filteredData.features = [...pointData.features];
-        filteredData.features = filteredData.features.filter(feature =>{
-            if(feature.properties[field] == value){
+        // Filter type
+        if(criteria.TYPE == 'All Types' ){
+          
+        }else {
+          filteredData.features = filteredData.features.filter(feature =>{
+            if(feature.properties.TYPE == criteria.TYPE){
                 return feature;
             }
+          });
+        }
+
+        console.log(filteredData);
+        // filter company
+        if(criteria.COMPANY == 'All Companies' ){
+          // return feature;
+        }else {
+          filteredData.features = filteredData.features.filter(feature =>{
+
+            if(feature.properties.COMPANY == criteria.COMPANY){
+                return feature;
+            }
+          });
+        }
+
+        console.log(filteredData);
+        // filter score
+        if(criteria.SCORE == null){
+
+        }else {
+          filteredData.features = filteredData.features.filter(feature =>{
+            if(feature.properties.SCORE == criteria.SCORE){
+                return feature;
+            }
+          });
+        }
+
+        console.log(filteredData);
+        // filter date
+        let dates = criteria.DATE;
+        filteredData.features = filteredData.features.filter(feature =>{
+          if(new Date(feature.properties['DATE']) >= new Date(dates[0]) && 
+              new Date(feature.properties['DATE']) <= new Date(dates[1])  
+          ){
+              return feature;
+          }
         });
 
+        console.log(filteredData);
         map.getSource("csvData").setData(filteredData);
 
         // get layer bounds and fit to the bounds
-        var filterCount = filteredData.features.length - 1;
-        var coordinates = filteredData.features.map(feature => feature.geometry.coordinates);
-        let latBounds = new mapboxgl.LngLatBounds(coordinates[0], coordinates[filterCount]);
-      
-        map.fitBounds(latBounds, {
-          padding:20
-        });
+        if(filteredData.features.length == 0) {
+          // notify the user
+          let text = "No data matching the criteria found";
+          $('.snackbar').text(text).toggleClass('open');
+
+        } else{
+          var filterCount = filteredData.features.length - 1;
+          var coordinates = filteredData.features.map(feature => feature.geometry.coordinates);
+          let latBounds = new mapboxgl.LngLatBounds(coordinates[0], coordinates[filterCount]);
+        
+          map.fitBounds(latBounds, {
+            padding:20
+          });
+        }
+        
     }
 
     // Update the type
     function updateTypeInput() {
         let types = pointData.features.map(feature => feature.properties.TYPE);
         types = [...new Set(types)];
+
+        // append all types
+        types.unshift('All Types');
 
         // update the option
         createOptions(type, types);
@@ -251,13 +349,14 @@ var transformRequest = (url, resourceType) => {
         let companies = pointData.features.map(feature => feature.properties.COMPANY);
         companies = [...new Set(companies)];
 
+        companies.unshift('All Companies');
         // update the option
         createOptions(company, companies);
     }
 
     function createOptions(element, list){
         var options = list.map(el=> {
-            return `<option value=${el}>${el}</option>`
+            return `<option value='${el}'>${el}</option>`
         });
 
         element.append(options);
@@ -272,7 +371,8 @@ var transformRequest = (url, resourceType) => {
         // update the data input
         score.attr({
             'max':scores[scores.length-1],
-            'min':scores[0]
+            'min':scores[0],
+            'value':''
         });
     }
 
@@ -289,11 +389,92 @@ var transformRequest = (url, resourceType) => {
         $('.end-date').text(dates[dates.length - 1]);
 
         // Create the slider
-        date.attr({
-          'max':dates.length-1,
-          'min':0
-        });
+        let max = dates.length-1;
 
+        // call to slider
+        dateSlider(max);
+    }
+
+    function dateSlider(max){
+      $('#date').slider({
+        min:0,
+        max:max,
+        value:[0, max],
+        focus:true,
+        range:true,
+        ticks_tooltip:true       
+      }).on('slide', function(e){
+        // update the tooltips
+        let dates = [datesArray[e.value[0]], datesArray[e.value[1]]];
+        
+        // update text
+        $('.start-date').text(dates[0]);
+        $('.end-date').text(dates[1]);
+      }).on('slideStop', function(e){
+          // filter the data
+          let dates = [datesArray[e.value[0]], datesArray[e.value[1]]];
+
+          filterObject.DATE = dates;
+          filterData(filterObject );
+
+      }); 
+  }
+
+    // reset styles 
+    $('#reset-filter').on('click', resetFilter);
+    function resetFilter(){
+      // reset form values
+      updateDateInput();
+      $('#date').slider('setValue',[0, datesArray.length-1]);
+
+      updateCompanyInput();
+      updateScoreInput()
+      updateTypeInput();
+
+      map.getSource('csvData').setData(pointData);
+      isFilterMode = !isFilterMode;
+
+      // reset filter object
+      filterObject = {
+        'COMPANY':'All Companies',
+        'TYPE':'All Types',
+        'SCORE':null,
+        'DATE':["1 March 2017", "03 June 2020"]
+      };
+    }
+
+    // left and rightbutton
+    function popupClickHandler() {
+      $('.fa-caret-right').on('click',function(e){
+        activeIndex += 1;
+        if( activeIndex > popupContent.length-1){
+          activeIndex = 0;
+        }
+
+        updatePopup(activeIndex);
+        
+      });
+
+      $('.fa-caret-left').on('click',function(e){
+        activeIndex -= 1;
+        if( activeIndex < 0){
+          activeIndex = popupContent.length-1;
+        }
+
+        updatePopup(activeIndex);
+        
+      });
+    }
+
+    // update the popup content
+    function updatePopup(index){
+      console.log(popupContent[index]);
+      new mapboxgl.Popup()
+            .setLngLat(popupCoordinate)
+            .setHTML(`<div class="popup-container">${popupContent[index]}</div>`)
+            .addTo(map);
+          
+      popupClickHandler();
     }
 
     // toggle the side-menu

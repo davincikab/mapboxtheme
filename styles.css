@@ -3,6 +3,7 @@
     --black:hsla(120, 0%, 0%,0.9);
     --white:hsl(120, 50%, 100%);
     --gray:hsl(0, 1%, 63%);
+    --error-text:hsl(0, 80%, 50%);
     --spinner-backdrop:hsla(0, 0%, 0%, 0.8);
     font-size: calc(0.5em + 1vh);
     font-family: monospace;
@@ -90,6 +91,29 @@ body {
       font-size: 1rem;
   }
 
+  .form-group .slider-horizontal {
+    width: 100%;
+    margin-left: 0.5em;
+  }
+
+  .snackbar{
+    position: fixed;
+    bottom: 0%;
+    left: 15vw;
+    background-color: var(--error-text);
+    color:var(--white);
+    transition: all 0.3s linear;
+    border-radius: 5px;
+    z-index: 2;
+    opacity: 0;
+    padding:2em 1em;
+  }
+
+  .snackbar.open {
+    bottom: 10%;
+    opacity: 0.9;
+  }
+  
   /* Popup styling */
   .mapboxgl-popup {
     padding-bottom: 5px;
@@ -146,6 +170,25 @@ body {
 
   .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
     border-bottom-color: rgb(61, 59, 59);
+  }
+
+  /* Multiple popups */
+  .popup-container{
+    display:flex;
+  }
+
+  .popup-element {
+    width: 100%;
+  }
+
+  .popup-element h3 {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .popup-element h3 .fa:focus{
+    outline: 1px solid aqua;
+    color: aquamarine;
   }
 
 /* spinnner */
@@ -230,6 +273,10 @@ body {
   .spinner-status {
     bottom:38%;
     left: calc(40% + 7vw);
+  }
+
+  .snackbar{
+    left: 38vw;
   }
 }
 

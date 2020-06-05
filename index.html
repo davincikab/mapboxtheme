@@ -13,6 +13,7 @@
   <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 
   <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="bootstrap-slider/css/bootstrap-slider.css">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" 
       integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 </head>
@@ -52,7 +53,7 @@
               </div>
 
               <input type="range" name="score" id="score" 
-              class="form-control form-control-sm" max="120" min="10" step="1">
+              class="form-control form-control-sm" max="120" min="10" step="1" value="">
 
               <div class="input-group-prepend">
                 <span class="max ml-1">100</span>
@@ -61,28 +62,26 @@
            
           </div>
 
-          <div class="form-group">
-            <label for="type">Date</label>
-            <!-- <input type="date" name="date" id="date" class="form-control form-control-sm"> -->
-            <input type="range" name="date" id="date" 
-                class="form-control form-control-sm" step="1" min="0" max="100">
+          <div class="pt-3 form-group" id="form-group-date">
+            <label for="type">Date</label><br>
+            <input type="text" name="date" id="date" class="ml-1">
 
             <div class="ranges d-flex justify-content-between">
               <p class="start-date"></p>
               <p class="end-date"></p>
             </div>
           </div>
-
-          <div class="form-group">
-
-          </div>
         </form>
+        <div class="form-group">
+          <button class="btn" id="reset-filter">Reset Filter</button>
+        </div>
       </div>
       
     </div>
     <div id='map'></div>
   </main>
 
+  <div class="snackbar"></div>
   <div class="spinner-modal">
     <div class="spinner-backdrop">
       <!-- gif -->
@@ -92,6 +91,7 @@
   </div>
   
   <!-- <script class=""></script> -->
+  <script src="bootstrap-slider/bootstrap-slider.js"></script>
   <script async src="main.js"></script>
   
 </body>
