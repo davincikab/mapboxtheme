@@ -264,6 +264,14 @@ var transformRequest = (url, resourceType) => {
     function filterData(criteria) {
         // resetIndex
         activeIndex = 0;
+
+        // remove a popup if open
+        var popUps = document.getElementsByClassName('mapboxgl-popup');
+        if (popUps[0]) {
+          popUps[0].remove();
+        }
+
+
         filteredData.features = [...pointData.features];
         // Filter type
         if(criteria.TYPE == 'All Types' ){
