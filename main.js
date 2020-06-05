@@ -71,7 +71,7 @@ var transformRequest = (url, resourceType) => {
           $('.spinner-modal').css('display', 'none');
         },4000)
         
-
+        var colors = ['#d73027','#fc8d59','#fee08b','#ffffbf','#d9ef8b','#91cf60','#1a9850'];
         // Load the map
         map.on('load', function () {
 
@@ -136,18 +136,18 @@ var transformRequest = (url, resourceType) => {
                   'match',
                   ['get', 'TYPE'],
                   'TYPEA',
-                  '#F2F12D',
+                  colors[0],
                   'TYPEB',
-                  '#EED322',
+                  colors[1],
                   'TYPEC',
-                  '#E6B71E',
+                  colors[2],
                   'TYPED',
-                  '#DA9C20',
+                  colors[3],
                   'TYPEE',
-                  '#CA8323',
+                  colors[4],
                   'TYPEF',
-                  '#B86B25',
-                  '#dd0000'
+                  colors[5],
+                  colors[6]
                 ],
                 'circle-stroke-width':0,
             }
